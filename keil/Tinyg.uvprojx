@@ -332,10 +332,10 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls></MiscControls>
+              <MiscControls>--gnu</MiscControls>
               <Define>USE_STDPERIPH_DRIVER,STM32F40_41xxx</Define>
               <Undefine></Undefine>
-              <IncludePath>..\src\STM32F4xx_StdPeriph_Driver\inc;..\src;..\src\tinyg\xio;..\src\Drivers</IncludePath>
+              <IncludePath>..\src\STM32F4xx_StdPeriph_Driver\inc;..\src;..\src\tinyg\xio;..\src\Drivers;..\src\tinyg;..\src\tinyg\xmega</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1270,29 +1270,14 @@
           <GroupName>TinyG-XIO</GroupName>
           <Files>
             <File>
-              <FileName>xio_tim.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\tinyg\xio\xio_tim.c</FilePath>
-            </File>
-            <File>
-              <FileName>xio_tim.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\tinyg\xio\xio_tim.h</FilePath>
-            </File>
-            <File>
               <FileName>xio_usart.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\tinyg\xio\xio_usart.c</FilePath>
             </File>
             <File>
-              <FileName>xio_usb.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\tinyg\xio\xio_usb.c</FilePath>
-            </File>
-            <File>
-              <FileName>motor.h</FileName>
+              <FileName>xio_usart.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\tinyg\xio\motor.h</FilePath>
+              <FilePath>..\src\tinyg\xio\xio_usart.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1438,11 +1423,6 @@
               <FilePath>..\src\tinyg\kinematics.c</FilePath>
             </File>
             <File>
-              <FileName>network.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\tinyg\network.c</FilePath>
-            </File>
-            <File>
               <FileName>persistence.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\tinyg\persistence.c</FilePath>
@@ -1508,11 +1488,6 @@
               <FilePath>..\src\tinyg\text_parser.c</FilePath>
             </File>
             <File>
-              <FileName>ting_main.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\tinyg\ting_main.c</FilePath>
-            </File>
-            <File>
               <FileName>util.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\tinyg\util.c</FilePath>
@@ -1521,6 +1496,16 @@
               <FileName>xio.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\tinyg\xio.c</FilePath>
+            </File>
+            <File>
+              <FileName>main.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\tinyg\main.c</FilePath>
+            </File>
+            <File>
+              <FileName>system.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\tinyg\system.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1633,7 +1618,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>TinygInc</GroupName>
+          <GroupName>TinyG-H</GroupName>
           <Files>
             <File>
               <FileName>canonical_machine.h</FileName>
@@ -1689,11 +1674,6 @@
               <FileName>kinematics.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\src\tinyg\kinematics.h</FilePath>
-            </File>
-            <File>
-              <FileName>network.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\tinyg\network.h</FilePath>
             </File>
             <File>
               <FileName>persistence.h</FileName>
@@ -1759,11 +1739,6 @@
               <FileName>text_parser.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\src\tinyg\text_parser.h</FilePath>
-            </File>
-            <File>
-              <FileName>ting_main.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\tinyg\ting_main.h</FilePath>
             </File>
             <File>
               <FileName>tinyg.h</FileName>
