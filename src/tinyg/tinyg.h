@@ -45,9 +45,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-
+#include <math.h>
 /****** REVISIONS ******/
-
+#include "xio_api.h"
 #define TINYG_FIRMWARE_BUILD        449.01	// edge-0.97 build for testing
 #define TINYG_FIRMWARE_VERSION		0.97					    // firmware major version
 #define TINYG_CONFIG_VERSION		5							// CV values start at 5 for backwards compatibility
@@ -132,22 +132,22 @@ typedef enum {
 /*********************
  * AVR Compatibility *
  *********************/
-#ifdef __AVR
+#ifdef __AVR//xzw168
 
-#include <avr/pgmspace.h>		// defines PROGMEM and PSTR
+//#include <avr/pgmspace.h>		// defines PROGMEM and PSTR
 																	// gets rely on nv->index having been set
-#define GET_TOKEN_BYTE(a)  (char)pgm_read_byte(&cfgArray[i].a)	    // get token byte value from cfgArray
-#define GET_TABLE_WORD(a)  pgm_read_word(&cfgArray[nv->index].a)	// get word value from cfgArray
-#define GET_TABLE_FLOAT(a) pgm_read_float(&cfgArray[nv->index].a)	// get float value from cfgArray
+//#define GET_TOKEN_BYTE(a)  (char)pgm_read_byte(&cfgArray[i].a)	    // get token byte value from cfgArray
+//#define GET_TABLE_WORD(a)  pgm_read_word(&cfgArray[nv->index].a)	// get word value from cfgArray
+//#define GET_TABLE_FLOAT(a) pgm_read_float(&cfgArray[nv->index].a)	// get float value from cfgArray
 
 // populate the shared buffer with the token string given the index
 //#define GET_TOKEN_STRING(i,a) strcpy_P(a, (char *)&cfgArray[(index_t)i].token);
 
 // get text from an array of strings in PGM and convert to RAM string
-#define GET_TEXT_ITEM(b,a) strncpy_P(text_item,(const char *)pgm_read_word(&b[a]), TEXT_ITEM_LEN-1)
+//#define GET_TEXT_ITEM(b,a) strncpy_P(text_item,(const char *)pgm_read_word(&b[a]), TEXT_ITEM_LEN-1)
 
 // get units from array of strings in PGM and convert to RAM string
-#define GET_UNITS(a) strncpy_P(units_msg,(const char *)pgm_read_word(&msg_units[cm_get_units_mode(a)]), UNITS_MSG_LEN-1)
+//#define GET_UNITS(a) strncpy_P(units_msg,(const char *)pgm_read_word(&msg_units[cm_get_units_mode(a)]), UNITS_MSG_LEN-1)
 
 // IO settings
 #define STD_IN 	XIO_DEV_USB		// default IO settings

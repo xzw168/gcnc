@@ -33,7 +33,7 @@
 #include "pwm.h"
 
 #ifdef __AVR
-#include <avr/interrupt.h>
+//#include <avr/interrupt.h>
 #endif
 
 /***** PWM defines, structures and memory allocation *****/
@@ -81,7 +81,7 @@ pwmSingleton_t pwm;
  */
 void pwm_init()
 {
-#ifdef __AVR
+#ifdef __AVR1 //xzw168
 	gpio_set_bit_off(SPINDLE_PWM);
 
 	// setup PWM channel 1
@@ -103,7 +103,7 @@ void pwm_init()
 /*
  * ISRs for PWM timers
  */
-#ifdef __AVR
+#ifdef __AVR1 //xzw168
 ISR(PWM1_ISR_vect)
 {
 	return;
@@ -144,7 +144,7 @@ stat_t pwm_set_freq(uint8_t chan, float freq)
 	if (freq > PWM_MAX_FREQ) { return (STAT_INPUT_EXCEEDS_MAX_VALUE);}
 	if (freq < PWM_MIN_FREQ) { return (STAT_INPUT_LESS_THAN_MIN_VALUE);}
 
-#ifdef __AVR
+#ifdef __AVR1 //xzw168
 	// set the period and the prescaler
 	float prescale = F_CPU/65536/freq;	// optimal non-integer prescaler value
 	if (prescale <= 1) {
@@ -194,7 +194,7 @@ stat_t pwm_set_duty(uint8_t chan, float duty)
 	if (duty < 0.0) { return (STAT_INPUT_LESS_THAN_MIN_VALUE);}
 	if (duty > 1.0) { return (STAT_INPUT_EXCEEDS_MAX_VALUE);}
 
-	#ifdef __AVR
+	#ifdef __AVR1 //xzw168
 //  Ffrq = Fper/(2N(CCA+1))
 //  Fpwm = Fper/((N(PER+1))
 	float period_scalar = pwm.p[chan].timer->PER;

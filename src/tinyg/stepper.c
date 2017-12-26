@@ -201,7 +201,7 @@ void stepper_init()
 	memset(&st_run, 0, sizeof(st_run));			// clear all values, pointers and status
 	stepper_init_assertions();
 
-#ifdef __AVR
+#ifdef __AVR1 //xzw168
 	// Configure virtual ports
 	PORTCFG.VPCTRLA = PORTCFG_VP0MAP_PORT_MOTOR_1_gc | PORTCFG_VP1MAP_PORT_MOTOR_2_gc;
 	PORTCFG.VPCTRLB = PORTCFG_VP2MAP_PORT_MOTOR_3_gc | PORTCFG_VP3MAP_PORT_MOTOR_4_gc;
@@ -507,7 +507,7 @@ stat_t st_motor_power_callback() 	// called by controller
  * ISR - DDA timer interrupt routine - service ticks from DDA timer
  */
 
-#ifdef __AVR
+#ifdef __AVR1 //xzw168
 /*
  *	Uses direct struct addresses and literal values for hardware devices - it's faster than
  *	using indexed timer and port accesses. I checked. Even when -0s or -03 is used.
@@ -619,7 +619,7 @@ MOTATE_TIMER_INTERRUPT(dda_timer_num)
  * ISR - DDA timer interrupt routine - service ticks from DDA timer
  */
 
-#ifdef __AVR
+#ifdef __AVR1 //xzw168
 ISR(TIMER_DWELL_ISR_vect) {								// DWELL timer interrupt
 	if (--st_run.dda_ticks_downcount == 0) {
 		TIMER_DWELL.CTRLA = STEP_TIMER_DISABLE;			// disable DWELL timer
@@ -650,11 +650,11 @@ MOTATE_TIMER_INTERRUPT(dwell_timer_num)
 void st_request_exec_move()
 {
 	if (st_pre.buffer_state == PREP_BUFFER_OWNED_BY_EXEC) {// bother interrupting
-		TIMER_EXEC.PER = EXEC_TIMER_PERIOD;
-		TIMER_EXEC.CTRLA = EXEC_TIMER_ENABLE;				// trigger a LO interrupt
+		//TIMER_EXEC.PER = EXEC_TIMER_PERIOD;//xzw168
+		//TIMER_EXEC.CTRLA = EXEC_TIMER_ENABLE;				// trigger a LO interrupt
 	}
 }
-
+/*//xzw168
 ISR(TIMER_EXEC_ISR_vect) {								// exec move SW interrupt
 	TIMER_EXEC.CTRLA = EXEC_TIMER_DISABLE;				// disable SW interrupt timer
 
@@ -665,7 +665,7 @@ ISR(TIMER_EXEC_ISR_vect) {								// exec move SW interrupt
 			_request_load_move();
 		}
 	}
-}
+}*/
 #endif // __AVR
 
 #ifdef __ARM
@@ -708,15 +708,15 @@ static void _request_load_move()
 		return;													// don't request a load if the runtime is busy
 	}
 	if (st_pre.buffer_state == PREP_BUFFER_OWNED_BY_LOADER) {	// bother interrupting
-		TIMER_LOAD.PER = LOAD_TIMER_PERIOD;
-		TIMER_LOAD.CTRLA = LOAD_TIMER_ENABLE;					// trigger a HI interrupt
+		//TIMER_LOAD.PER = LOAD_TIMER_PERIOD;//xzw168
+		//TIMER_LOAD.CTRLA = LOAD_TIMER_ENABLE;					// trigger a HI interrupt
 	}
 }
 
-ISR(TIMER_LOAD_ISR_vect) {										// load steppers SW interrupt
+/*ISR(TIMER_LOAD_ISR_vect) {//xzw168										// load steppers SW interrupt
 	TIMER_LOAD.CTRLA = LOAD_TIMER_DISABLE;						// disable SW interrupt timer
 	_load_move();
-}
+}*/
 #endif // __AVR
 
 #ifdef __ARM
@@ -948,14 +948,14 @@ static void _load_move()
 #endif
 		//**** do this last ****
 
-		TIMER_DDA.PER = st_pre.dda_period;
-		TIMER_DDA.CTRLA = STEP_TIMER_ENABLE;			// enable the DDA timer
+		//TIMER_DDA.PER = st_pre.dda_period;//xzw168
+		//TIMER_DDA.CTRLA = STEP_TIMER_ENABLE;			// enable the DDA timer
 
 	// handle dwells
 	} else if (st_pre.block_type == BLOCK_TYPE_DWELL) {
 		st_run.dda_ticks_downcount = st_pre.dda_ticks;
-		TIMER_DWELL.PER = st_pre.dda_period;			// load dwell timer period
-		TIMER_DWELL.CTRLA = STEP_TIMER_ENABLE;			// enable the dwell timer
+		//TIMER_DWELL.PER = st_pre.dda_period;			//xzw168 load dwell timer period
+		//TIMER_DWELL.CTRLA = STEP_TIMER_ENABLE;			// enable the dwell timer
 
 	// handle synchronous commands
 	} else if (st_pre.block_type == BLOCK_TYPE_COMMAND) {

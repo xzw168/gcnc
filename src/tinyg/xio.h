@@ -63,6 +63,11 @@
 #ifndef XIO_H_ONCE
 #define XIO_H_ONCE
 
+
+
+#include "xio/xio_usart.h"
+
+
 /*************************************************************************
  *	Device configurations
  *************************************************************************/
@@ -146,65 +151,7 @@ typedef enum {
     RX_MODE_LINE                                 // line mode input (packet)
 } xioRXMode;
 
-typedef struct xioDEVICE {						// common device struct (one per dev)
-	// references and self references
-	uint16_t magic_start;						// memory integrity check
-	uint8_t dev;								// self referential device number
-	FILE file;									// stdio FILE stream structure
-	void *x;									// extended device struct binding (static)
 
-	// function bindings
-	FILE *(*x_open)(const uint8_t dev, const char *addr, const flags_t flags);
-	int (*x_ctrl)(struct xioDEVICE *d, const flags_t flags);	 // set device control flags
-	int (*x_gets)(struct xioDEVICE *d, char *buf, const int size);// non-blocking line reader
-	int (*x_getc)(FILE *);						// read char (stdio compatible)
-	int (*x_putc)(char, FILE *);				// write char (stdio compatible)
-	void (*x_flow)(struct xioDEVICE *d);		// flow control callback function
-
-#ifdef __BITFIELDS
-	// device configuration flags
-	uint8_t flag_block      : 1 ;
-	uint8_t flag_echo       : 1 ;
-	uint8_t flag_crlf       : 1 ;
-	uint8_t flag_ignorecr   : 1 ;
-	uint8_t flag_ignorelf   : 1 ;
-	uint8_t flag_linemode   : 1 ;
-	uint8_t flag_xoff       : 1 ;               // xon/xoff enabled
-
-	// private working data and runtime flags
-	uint8_t flag_in_line    : 1 ;               // used as a state variable for line reads
-	uint8_t flag_eol        : 1 ;               // end of line detected
-	uint8_t flag_eof        : 1 ;               // end of file detected
-	uint8_t signal          : 4 ;               // signal value
-#else
-	// device configuration flags
-	uint8_t flag_block      ;
-	uint8_t flag_echo       ;
-	uint8_t flag_crlf       ;
-	uint8_t flag_ignorecr   ;
-	uint8_t flag_ignorelf   ;
-	uint8_t flag_linemode   ;
-	uint8_t flag_xoff       ;               // xon/xoff enabled
-
-	// private working data and runtime flags
-	uint8_t flag_in_line    ;               // used as a state variable for line reads
-	uint8_t flag_eol        ;               // end of line detected
-	uint8_t flag_eof        ;               // end of file detected
-	uint8_t signal          ;               // signal value
-#endif
-
-	int size;									// text buffer length (dynamic)
-	uint8_t len;								// chars read so far (buf array index)
-	char *buf;									// text buffer binding (can be dynamic)
-	uint16_t magic_end;
-} xioDev_t;
-
-typedef FILE *(*x_open_t)(const uint8_t dev, const char *addr, const flags_t flags);
-typedef int (*x_ctrl_t)(xioDev_t *d, const flags_t flags);
-typedef int (*x_gets_t)(xioDev_t *d, char *buf, const int size);
-typedef int (*x_getc_t)(FILE *);
-typedef int (*x_putc_t)(char, FILE *);
-typedef void (*x_flow_t)(xioDev_t *d);
 
 
 /******************************************************************************
@@ -227,55 +174,14 @@ typedef enum {                              // readline() buffer and slot states
     BUFFER_PROCESSING                       // buffer is in use by the caller
 } cmBufferState;
 
-/* and now for some ASCII art: Buffer pool viewed from top to bottom
- * ----- pool_top (char * address)
- * -----
- * ----- free - free space at the top of the filling buffer
- * -----      - (filling) currently open buffer for filling
- * -----      - (control or data) full buffer N
- * -----      - (control or data) ....
- * -----      - (control or data) full buffer 2
- * -----      - (control or data) full buffer 1
- * ----- used - (processing) buffer being processed by controller
- * -----
- * ----- pool_base  (char * address)
- */
 
-typedef struct bufHdr {                 // buffer header (NB: It's not actually IN the allocated memory block)
-    uint8_t bufnum;                     //+++++ DIAGNOSTIC. Can be removed
-    struct bufHdr *pv;                  // pointer to previous header block
-    struct bufHdr *nx;                  // pointer to next header block
-    cmBufferState state;                // header state: see cmBufferState
-    uint8_t flags;                      // DEV_IS_CTRL, DEV_IS_DATA, DEV_IS_NONE
-    uint16_t size;                      // buffer size in bytes
-    char *bufp;                         // pointer to char buffer start (finally!)
-} buf_hdr_t;
 
-typedef struct bufMgr {                 // structure to manage a buffer pool
-    uint16_t magic_start;
-    buf_hdr_t *used_base;               // start of used headers: may be filling, ctrl, data, processing
-    buf_hdr_t *used_top;                // end of used headers
-    uint16_t requested_size;            // minimum size for requested buffer size (user configurable)
-    uint8_t fragments;                  // used to track header fragmentation
-    uint8_t free_headers;               // running count of free buffers
-    uint8_t out_of_ram;                 // true if allocation failure occurs
-    char *pool_base;                    // starting address of buffer pool
-    char *pool_top;                     // ending address of buffer pool
-    buf_hdr_t buf[RX_HEADERS];          // circular linked list of header structs
-    uint16_t magic_end;
-} buf_mgr_t;
-buf_mgr_t bm;                           // buffer manager struct for _CTRL and _DATA
 
-typedef struct bufPool {
-    uint16_t magic_start;
-    char rx_pool[RX_BUFFER_POOL_SIZE];  // statically allocated buffer pool with guard bands
-    uint16_t magic_end;
-} buf_pool_t;
-buf_pool_t bufpool;
+
 
 typedef struct xioSingleton {
     uint16_t magic_start;
-    FILE * stderr_shadow;				// used for stack overflow / memory integrity checking
+    //FILE * stderr_shadow;				// used for stack overflow / memory integrity checking xzw168
 
     // communications settings
     uint8_t primary_src;				// primary input source device
@@ -297,68 +203,74 @@ typedef struct xioSingleton {
 
     uint16_t magic_end;
 } xioSingleton_t;
-xioSingleton_t xio;
+extern  xioSingleton_t xio;
 
-/*************************************************************************
- *	Sub-Includes and static allocations
- *************************************************************************/
-// Put all sub-includes here so only xio.h is needed elsewhere
-#include "xio/xio_file.h"
-#include "xio/xio_usart.h"
-#include "xio/xio_spi.h"
+struct __file {
+	char	*buf;		/* buffer pointer */
+	unsigned char unget;	/* ungetc() buffer */
+	uint8_t	flags;		/* flags, see below */
+#define __SRD	0x0001		/* OK to read */
+#define __SWR	0x0002		/* OK to write */
+#define __SSTR	0x0004		/* this is an sprintf/snprintf string */
+#define __SPGM	0x0008		/* fmt string is in progmem */
+#define __SERR	0x0010		/* found error */
+#define __SEOF	0x0020		/* found EOF */
+#define __SUNGET 0x040		/* ungetc() happened */
+#define __SMALLOC 0x80		/* handle is malloc()ed */
+#if 0
+/* possible future extensions, will require uint16_t flags */
+#define __SRW	0x0100		/* open for reading & writing */
+#define __SLBF	0x0200		/* line buffered */
+#define __SNBF	0x0400		/* unbuffered */
+#define __SMBF	0x0800		/* buf is from malloc */
+#endif
+	int	size;		/* size of buffer */
+	int	len;		/* characters read or written so far */
+	int	(*put)(char, struct __file *);	/* function to write one char to device */
+	int	(*get)(struct __file *);	/* function to read one char from device */
+	void	*udata;		/* User defined and accessible data. */
+};
+#undef FILE
+#define FILE struct __file 
 
-// Static structure allocations
-xioDev_t 		ds[XIO_DEV_COUNT];			// allocate top-level dev structs
-xioUsart_t 		us[XIO_DEV_USART_COUNT];	// USART extended IO structs
-xioSpi_t 		spi[XIO_DEV_SPI_COUNT];		// SPI extended IO structs
-xioFile_t 		fs[XIO_DEV_FILE_COUNT];		// FILE extended IO structs
-extern struct controllerSingleton tg;		// needed by init() for default source
+typedef struct xioDEVICE {						// common device struct (one per dev)
+	// references and self references
+	uint16_t magic_start;						// memory integrity check
+	uint8_t dev;								// self referential device number
+	FILE file;									// stdio FILE stream structure
+	void *x;									// 扩展设备结构绑定（静态）
 
-/*************************************************************************
- *	Function Prototypes and Macros
- *************************************************************************/
+	// function bindings
+	FILE *(*x_open)(const uint8_t dev, const char *addr, const flags_t flags);
+	int (*x_ctrl)(struct xioDEVICE *d, const flags_t flags);	 // set device control flags
+	int (*x_gets)(struct xioDEVICE *d, char *buf, const int size);// non-blocking line reader
+	int (*x_getc)(FILE *);						// read char (stdio compatible)
+	int (*x_putc)(char, FILE *);				// write char (stdio compatible)
+	void (*x_flow)(struct xioDEVICE *d);		// flow control callback function
 
-// Advance RX or TX head or tail. Buffers count down, so advance is a decrement.
-// The zero condition is the wrap that sets the index back to the top.
-#define advance_buffer(buf,len) { if ((--(buf)) == 0) buf = len-1;}
+	// device configuration flags
+	uint8_t flag_block;
+	uint8_t flag_echo;
+	uint8_t flag_crlf;
+	uint8_t flag_ignorecr;
+	uint8_t flag_ignorelf;
+	uint8_t flag_linemode;
+	uint8_t flag_xoff;							// xon/xoff enabled
 
-// public functions (virtual class)
-void xio_init(void);
-void xio_init_assertions(void);
-uint8_t xio_test_assertions(void);
-uint8_t xio_isbusy(void);
+	// private working data and runtime flags
+	int size;									// text buffer length (dynamic)
+	uint8_t len;								// chars read so far (buf array index)
+	uint8_t signal;								// signal value
+	uint8_t flag_in_line;						// used as a state variable for line reads
+	uint8_t flag_eol;							// end of line detected
+	uint8_t flag_eof;							// end of file detected
+	char *buf;									// text buffer binding (can be dynamic)
+	uint16_t magic_end;
+} xioDev_t;
 
-char *readline(devflags_t *flags, uint16_t *size);
-void xio_reset_readline_linemode(void);
-uint8_t xio_get_line_buffers_available(void);
-//uint8_t xio_is_control(char *str);
 
-void xio_reset_working_flags(xioDev_t *d);
-FILE *xio_open(const uint8_t dev, const char *addr, const flags_t flags);
-int xio_ctrl(const uint8_t dev, const flags_t flags);
-int xio_gets(const uint8_t dev, char *buf, const int size);
-int xio_getc(const uint8_t dev);
-int xio_putc(const uint8_t dev, const char c);
-int xio_set_baud(const uint8_t dev, const uint8_t baud_rate);
 
-// generic functions (private, but at virtual level)
-int xio_ctrl_generic(xioDev_t *d, const flags_t flags);
 
-void xio_open_generic(uint8_t dev, x_open_t x_open,
-								   x_ctrl_t x_ctrl,
-								   x_gets_t x_gets,
-								   x_getc_t x_getc,
-								   x_putc_t x_putc,
-								   x_flow_t x_flow);
-
-void xio_fc_null(xioDev_t *d);			// NULL flow control callback
-void xio_fc_usart(xioDev_t *d);			// XON/XOFF flow control callback
-
-// std devices
-void xio_init_stdio(void);				// set std devs & do startup prompt
-void xio_set_stdin(const uint8_t dev);
-void xio_set_stdout(const uint8_t dev);
-void xio_set_stderr(const uint8_t dev);
 
 /*************************************************************************
  * SUPPORTING DEFINTIONS - SHOULD NOT NEED TO CHANGE

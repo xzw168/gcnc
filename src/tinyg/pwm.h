@@ -43,7 +43,7 @@ typedef struct pwmConfigChannel {
 
 typedef struct pwmChannel {
 	uint8_t ctrla;					// byte needed to active CTRLA (it's dynamic - rest are static)
-#ifdef __AVR
+#ifdef __AVR1 //xzw168
 	TC1_t *timer;					// assumes TC1 flavor timers used for PWM channels
 #endif
 } pwmChannel_t;

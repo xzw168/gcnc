@@ -26,7 +26,7 @@
  */
 
 #ifdef __AVR
-#include <avr/wdt.h>			// used for software reset
+//#include <avr/wdt.h>			// used for software reset
 #endif
 
 #include "tinyg.h"		// #1
@@ -36,10 +36,10 @@
 #include "controller.h"
 #include "text_parser.h"
 #ifdef __AVR
-#include "xmega/xmega_init.h"
-#include "xmega/xmega_rtc.h"
+//#include "xmega/xmega_init.h"
+//#include "xmega/xmega_rtc.h"
 #endif
-
+hwSingleton_t hw;
 /*
  * _port_bindings  - bind XMEGA ports to hardware - these changed at board revision 7
  * hardware_init() - lowest level hardware init
@@ -74,7 +74,7 @@ static void _port_bindings(float hw_version)
 
 void hardware_init()
 {
-#ifdef __AVR
+#ifdef __AVR1 //xzw168
 	xmega_init();							// set system clock
 	_port_bindings(TINYG_HARDWARE_VERSION);
 	rtc_init();								// real time counter
@@ -122,7 +122,7 @@ enum {
 
 static void _get_id(char *id)
 {
-#ifdef __AVR
+#ifdef __AVR1 //xzw168
 	char printable[33]; strcpy_P(printable, PSTR("ABCDEFGHJKLMNPQRSTUVWXYZ23456789"));
 	uint8_t i;
 
@@ -152,9 +152,9 @@ static void _get_id(char *id)
  */
 void hw_request_hard_reset() { cs.hard_reset_requested = true; }
 
-void hw_hard_reset(void)			// software hard reset using the watchdog timer
+void hw_hard_reset(void)			// software hard reset using the watchdog timer xzw168
 {
-#ifdef __AVR
+#ifdef __AVR1
 	wdt_enable(WDTO_15MS);
 	while (true);					// loops for about 15ms then resets
 #endif
@@ -180,7 +180,7 @@ void hw_request_bootloader() { cs.bootloader_requested = true;}
 
 stat_t hw_bootloader_handler(void)
 {
-#ifdef __AVR
+#ifdef __AVR1 //xzw168
 	if (cs.bootloader_requested == false) {
         return (STAT_NOOP);
     }

@@ -39,7 +39,7 @@
  *	and lockout subsequent interrupts for the defined lockout period. Ditto on the method.
  */
 
-#include <avr/interrupt.h>
+//#include <avr/interrupt.h>
 
 #include "tinyg.h"
 #include "config.h"
@@ -52,7 +52,7 @@
 
 static bool _read_raw_switch(const uint8_t sw_num);
 static void _dispatch_switch(const uint8_t sw_num);
-
+switches_t sw;
 /*
  * Interrupt levels and vectors - The vectors are hard-wired to xmega ports
  * If you change axis port assignments you need to change these, too.
@@ -94,7 +94,7 @@ static void _dispatch_switch(const uint8_t sw_num);
 
 void switch_init(void)
 {
-	for (uint8_t i=0; i<NUM_SWITCH_PAIRS; i++) {
+/*	for (uint8_t i=0; i<NUM_SWITCH_PAIRS; i++) {  //xz168
 		// setup input bits and interrupts (previously set to inputs by st_init())
 		if (sw.s[MIN_SWITCH(i)].mode != SW_MODE_DISABLED) {
 			hw.sw_port[i]->DIRCLR = SW_MIN_BIT_bm;		 	// set min input - see 13.14.14
@@ -112,7 +112,7 @@ void switch_init(void)
 		}
 		// set interrupt levels. Interrupts must be enabled in main()
 		hw.sw_port[i]->INTCTRL = GPIO1_INTLVL;				// see gpio.h for setting
-	}
+	}*/
 	reset_switches();
 }
 
@@ -133,7 +133,7 @@ void reset_switches()
         sw.s[i].state = _read_raw_switch(i);        // set initial conditions
         sw.s[i].edge = SW_EDGE_NONE;
         sw.s[i].lockout_ms = SW_LOCKOUT_MS;
-        Timeout_clear(&sw.s[i].timeout);            // clear lockout timer
+        //Timeout_clear(&sw.s[i].timeout);            //xzw168 clear lockout timer
 	}
 }
 
@@ -151,14 +151,14 @@ uint8_t get_switch_mode(const uint8_t sw_num) { return (sw.s[sw_num].mode);}
  * _dispatch_switch() - process a switch interrupt
  */
 
-ISR(X_MIN_ISR_vect)	{ _dispatch_switch(SW_MIN_X);}
+/*ISR(X_MIN_ISR_vect)	{ _dispatch_switch(SW_MIN_X);}//xzw168
 ISR(Y_MIN_ISR_vect)	{ _dispatch_switch(SW_MIN_Y);}
 ISR(Z_MIN_ISR_vect)	{ _dispatch_switch(SW_MIN_Z);}
 ISR(A_MIN_ISR_vect)	{ _dispatch_switch(SW_MIN_A);}
 ISR(X_MAX_ISR_vect)	{ _dispatch_switch(SW_MAX_X);}
 ISR(Y_MAX_ISR_vect)	{ _dispatch_switch(SW_MAX_Y);}
 ISR(Z_MAX_ISR_vect)	{ _dispatch_switch(SW_MAX_Z);}
-ISR(A_MAX_ISR_vect)	{ _dispatch_switch(SW_MAX_A);}
+ISR(A_MAX_ISR_vect)	{ _dispatch_switch(SW_MAX_A);}*/
 
 static bool _read_raw_switch(const uint8_t sw_num)
 {
@@ -183,10 +183,10 @@ static void _dispatch_switch(const uint8_t sw_num)
 	if (sw.s[sw_num].mode == SW_MODE_DISABLED) {        // input is disabled (not supposed to happen)
         return;
     }
-    if ((Timeout_isSet(&sw.s[sw_num].timeout)) &&
+    /*if ((Timeout_isSet(&sw.s[sw_num].timeout)) &&
         (!Timeout_isPast(&sw.s[sw_num].timeout))) {     // input is in lockout period
         return;
-    }
+    }*/ //xzw168
 	bool raw_switch = _read_raw_switch(sw_num);         // no change in state (not supposed to happen)
     if (sw.s[sw_num].state == raw_switch) {
         return;
@@ -195,7 +195,7 @@ static void _dispatch_switch(const uint8_t sw_num)
     // read the switch, set edges and start lockout timer
     sw.s[sw_num].state = raw_switch;                    // 1 = switch hit, 0 = switch unhit
     sw.s[sw_num].edge = raw_switch;                     // 1 = leading edge, 0 = trailing edge
-    Timeout_set(&sw.s[sw_num].timeout, sw.s[sw_num].lockout_ms);
+    //Timeout_set(&sw.s[sw_num].timeout, sw.s[sw_num].lockout_ms); //xzw168
 
     //*** execute the functions ***/
 

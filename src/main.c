@@ -52,8 +52,8 @@ int main(void)
 	rcc_Init();
 	xuart_Init();
 	xyz_io_init();
-	xio_tim_Init();
-    ting_main_Init();
+	//xio_tim_Init();
+    //ting_main_Init();
 	
 	// SystemFrequency / 1000    1ms中断一次
 	// SystemFrequency / 100000	 10us中断一次

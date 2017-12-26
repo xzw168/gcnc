@@ -46,7 +46,7 @@
  *					**** These bits CANNOT be used as 5v inputs ****
  */
 
-#include <avr/interrupt.h>
+//#include <avr/interrupt.h>
 
 #include "tinyg.h"
 #include "util.h"

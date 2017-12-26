@@ -31,7 +31,7 @@
 #include "util.h"
 
 #ifdef __AVR
-#include "xmega/xmega_eeprom.h"
+//#include "xmega/xmega_eeprom.h"
 #endif
 
 /***********************************************************************************

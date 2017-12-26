@@ -233,19 +233,19 @@ stat_t config_test_assertions()
 
 bool cfg_has_flag(index_t index, uint8_t bitmask)
 {
-#ifdef __AVR
+#ifdef __AVR1 //xzw168
     return (pgm_read_byte(&cfgArray[index].flags) & bitmask);
 #else
-    return (cfgArray[index].flags) & bitmask);
+    return cfgArray[index].flags & bitmask;
 #endif
 }
 
 valueType cfg_is_type(index_t index)
 {
-#ifdef __AVR
+#ifdef __AVR1 //xzw168
     return (pgm_read_byte(&cfgArray[index].flags) & F_TYPE_MASK);
 #else
-    return (cfgArray[index].flags) & F_TYPE_MASK);
+    return cfgArray[index].flags & F_TYPE_MASK;
 #endif
 }
 

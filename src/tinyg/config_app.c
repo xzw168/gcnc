@@ -889,8 +889,8 @@ static stat_t set_ex(nvObj_t *nv)				// enable XON/XOFF or RTS/CTS flow control
 }
 
 static stat_t get_rx(nvObj_t *nv)
-{
-#ifdef __AVR
+{ return (STAT_OK);
+#ifdef __AVR1 //xzw168
     if (xio.rx_mode == RX_MODE_CHAR) {
 	    nv->value_int = xio_get_usb_rx_free();
     } else {

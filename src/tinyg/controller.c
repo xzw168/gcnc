@@ -97,7 +97,7 @@ void controller_init(uint8_t std_in, uint8_t std_out, uint8_t std_err)
 	cs.hw_platform = TINYG_HARDWARE_PLATFORM;		// NB: HW version is set from EEPROM
 	cs.controller_state = CONTROLLER_STARTUP;		// ready to run startup lines
 
-#ifdef __AVR
+#ifdef __AVR1 //xzw168
 	xio_set_stdin(std_in);
 	xio_set_stdout(std_out);
 	xio_set_stderr(std_err);
@@ -413,10 +413,10 @@ static stat_t _normal_idler()
  * be expanded to also set the stdout/stderr console device so the prompt
  * and other messages are sent to the active device.
  */
-
-void controller_reset_source() { controller_set_primary_source(xio.default_src);}
-void controller_set_primary_source(uint8_t dev) { xio.primary_src = dev;}
-void controller_set_secondary_source(uint8_t dev) { xio.secondary_src = dev;}
+//xzw168
+void controller_reset_source() { /*controller_set_primary_source(xio.default_src);*/}
+void controller_set_primary_source(uint8_t dev) {/* xio.primary_src = dev;*/}
+void controller_set_secondary_source(uint8_t dev) { /*xio.secondary_src = dev;*/}
 void controller_request_enquiry() { printf_P(PSTR("{\"ack\":true}\n")); }
 
 /*
@@ -425,9 +425,9 @@ void controller_request_enquiry() { printf_P(PSTR("{\"ack\":true}\n")); }
  */
 static stat_t _sync_to_tx_buffer()
 {
-	if ((xio_get_tx_bufcount_usart(ds[XIO_DEV_USB].x) >= XOFF_TX_LO_WATER_MARK)) {
+	/*if ((xio_get_tx_bufcount_usart(ds[XIO_DEV_USB].x) >= XOFF_TX_LO_WATER_MARK)) {//xzw168
 		return (STAT_EAGAIN);
-	}
+	}*/
 	return (STAT_OK);
 }
 

@@ -57,7 +57,7 @@ uint8_t run_test(nvObj_t *nv)
 {
 	switch (nv->value_int) {
 		case 0: { return (STAT_OK);}
-#ifdef __CANNED_TESTS
+#ifdef __CANNED_TESTS1 //xzw168
 
 		case 1: { xio_open(XIO_DEV_PGM, PGMFILE(&test_smoke),PGM_FLAGS); break;}
 		case 2: { xio_open(XIO_DEV_PGM, PGMFILE(&test_homing),PGM_FLAGS); break;}

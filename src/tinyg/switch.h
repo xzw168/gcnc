@@ -27,7 +27,7 @@
 #ifndef SWITCH_H_ONCE
 #define SWITCH_H_ONCE
 
-#include "xmega/xmega_rtc.h"    // needed for Timeout function
+//#include "xmega/xmega_rtc.h"    // needed for Timeout function
 
 /*
  * Switch defines
@@ -96,7 +96,7 @@ typedef struct swSingleton {
 	swType switch_type;             // global setting for switch type
     switch_t s[NUM_SWITCHES];       // switch objects
 } switches_t;
-switches_t sw;
+extern switches_t sw;//xzw168
 
 /****************************************************************************************
  * Function prototypes

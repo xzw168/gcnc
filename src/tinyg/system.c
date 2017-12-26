@@ -34,11 +34,11 @@
 
 #include <stdio.h>
 #include <stddef.h> 
-#include <avr/pgmspace.h> 
+//#include <avr/pgmspace.h> 
 
 #include "tinyg.h"
 #include "system.h"
-#include "xmega/xmega_init.h"
+//#include "xmega/xmega_init.h"
 
 /*
  * sys_init() - lowest level hardware init
@@ -46,7 +46,7 @@
 
 void sys_init() 
 {
-	xmega_init();		// set system clock
+	//xmega_init();		// set system clock
 	sys_port_bindings(TINYG_HARDWARE_VERSION);
 }
 

@@ -82,8 +82,8 @@ typedef enum {
 ////////////////////////////
 
 #include "config.h"						// needed for the stat_t typedef
-#include <avr/interrupt.h>
-#include "xmega/xmega_rtc.h"			// Xmega only. Goes away with RTC refactoring
+//#include <avr/interrupt.h>
+//#include "xmega/xmega_rtc.h"			// Xmega only. Goes away with RTC refactoring
 
 // uncomment once motate Xmega port is available
 //#include "motatePins.h"
@@ -112,24 +112,24 @@ typedef enum {
  * Sorry if this is confusing - it's a board routing issue
  */
 #define PORT_MOTOR_1	PORTA			// motors mapped to ports
-#define PORT_MOTOR_2 	PORTF
-#define PORT_MOTOR_3	PORTE
-#define PORT_MOTOR_4	PORTD
+#define PORT_MOTOR_2 	PORTA
+#define PORT_MOTOR_3	PORTA
+#define PORT_MOTOR_4	PORTA
 
 #define PORT_SWITCH_X 	PORTA			// Switch axes mapped to ports
-#define PORT_SWITCH_Y 	PORTD
-#define PORT_SWITCH_Z 	PORTE
-#define PORT_SWITCH_A 	PORTF
+#define PORT_SWITCH_Y 	PORTA
+#define PORT_SWITCH_Z 	PORTA
+#define PORT_SWITCH_A 	PORTA
 
 #define PORT_OUT_V7_X	PORTA			// v7 mapping - Output bits mapped to ports
-#define PORT_OUT_V7_Y 	PORTF
-#define PORT_OUT_V7_Z	PORTD
-#define PORT_OUT_V7_A	PORTE
+#define PORT_OUT_V7_Y 	PORTA
+#define PORT_OUT_V7_Z	PORTA
+#define PORT_OUT_V7_A	PORTA
 
 #define PORT_OUT_V6_X	PORTA			// v6 and earlier mapping - Output bits mapped to ports
-#define PORT_OUT_V6_Y 	PORTF
-#define PORT_OUT_V6_Z	PORTE
-#define PORT_OUT_V6_A	PORTD
+#define PORT_OUT_V6_Y 	PORTA
+#define PORT_OUT_V6_Z	PORTA
+#define PORT_OUT_V6_A	PORTA
 
 // These next four must be changed when the PORT_MOTOR_* definitions change!
 #define PORTCFG_VP0MAP_PORT_MOTOR_1_gc PORTCFG_VP0MAP_PORTA_gc
@@ -138,9 +138,9 @@ typedef enum {
 #define PORTCFG_VP3MAP_PORT_MOTOR_4_gc PORTCFG_VP3MAP_PORTD_gc
 
 #define PORT_MOTOR_1_VPORT	VPORT0
-#define PORT_MOTOR_2_VPORT	VPORT1
-#define PORT_MOTOR_3_VPORT	VPORT2
-#define PORT_MOTOR_4_VPORT	VPORT3
+#define PORT_MOTOR_2_VPORT	VPORT0
+#define PORT_MOTOR_3_VPORT	VPORT0
+#define PORT_MOTOR_4_VPORT	VPORT0
 
 /*
  * Port setup - Stepper / Switch Ports:
@@ -256,7 +256,7 @@ typedef struct hmSingleton {
 	PORT_t *sw_port[MOTORS];		// bindings for switch ports (GPIO2)
 	PORT_t *out_port[MOTORS];		// bindings for output ports (GPIO1)
 } hwSingleton_t;
-hwSingleton_t hw;
+extern hwSingleton_t hw;
 
 /*** function prototypes ***/
 

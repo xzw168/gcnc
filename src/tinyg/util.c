@@ -34,7 +34,7 @@
 #include "util.h"
 
 #ifdef __AVR
-#include "xmega/xmega_rtc.h"
+//#include "xmega/xmega_rtc.h"
 #endif
 
 bool FLAGS_NONE[AXES] = { false, false, false, false, false, false };
@@ -397,7 +397,7 @@ uint16_t compute_checksum(char const *string, const uint16_t length)
 #ifdef __AVR
 uint32_t SysTickTimer_getValue()
 {
-	return (rtc.sys_ticks);
+	return 0;//(rtc.sys_ticks);//xzw168
 }
 #endif // __AVR
 
