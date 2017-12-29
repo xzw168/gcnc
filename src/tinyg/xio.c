@@ -15,7 +15,7 @@
 
 xioSingleton_t xio;
 xioDev_t 		ds[XIO_DEV_COUNT];
-
+static char buf[200];
 
 uint8_t xio_isbusy()
 {
@@ -26,7 +26,9 @@ uint8_t xio_isbusy()
 char *readline(devflags_t *flags, uint16_t *size)
 {
 
-    return 0;
+	if(xio_usart_gets(buf,200)==XIO_OK)
+		return buf;
+    return NULL;
 }
 
 buffer_t xio_get_usb_rx_free(void)

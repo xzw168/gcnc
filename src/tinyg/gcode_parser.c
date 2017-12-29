@@ -27,7 +27,7 @@
 #include "xio.h"			// for char definitions
 
 struct gcodeParserSingleton {	 	  // struct to manage globals
-	uint8_t modals[MODAL_GROUP_COUNT];// collects modal groups in a block
+	uint8_t modals[MODAL_GROUP_COUNT];// 在一个块中收集模态组 collects modal groups in a block
 }; struct gcodeParserSingleton gp;
 
 // local helper functions and macros
@@ -274,7 +274,7 @@ static stat_t _parse_gcode_block(char *buf)
 	stat_t status = STAT_OK;
 
 	// set initial state for new move
-	memset(&gp, 0, sizeof(gp));						// clear all parser values
+	memset(&gp, 0, sizeof(gp));						// 清除所有解析器值
 	memset(&cm.gf, 0, sizeof(GCodeFlags_t));		// clear all next-state flags
 	memset(&cm.gn, 0, sizeof(GCodeInput_t));		// clear all next-state values
 	cm.gn.motion_mode = cm_get_motion_mode(MODEL);	// get motion mode from previous block
@@ -324,6 +324,7 @@ static stat_t _parse_gcode_block(char *buf)
 				case 40: break;	// ignore cancel cutter radius compensation
                 case 43: {
 					switch (_point(value)) {
+					//	case 0: SET_NON_MODAL (next_action, NEXT_ACTION_SET_TL_OFFSET);
     					case 1: { cm.gf.tool_offset_set=1; break; }     // set flag for set
     					default: status = STAT_GCODE_COMMAND_UNSUPPORTED;
 					}
@@ -414,6 +415,7 @@ static stat_t _parse_gcode_block(char *buf)
 		//	case 'U': SET_NON_MODAL (target[AXIS_U], value);		// reserved
 		//	case 'V': SET_NON_MODAL (target[AXIS_V], value);		// reserved
 		//	case 'W': SET_NON_MODAL (target[AXIS_W], value);		// reserved
+		//	case 'H': SET_NON_MODAL (H_word, value);
 			case 'I': SET_NON_MODAL (arc_offset[0], value);
 			case 'J': SET_NON_MODAL (arc_offset[1], value);
 			case 'K': SET_NON_MODAL (arc_offset[2], value);
@@ -430,7 +432,7 @@ static stat_t _parse_gcode_block(char *buf)
 	if ((status != STAT_OK) && (status != STAT_COMPLETE)) {
         return (status);
     }
-	ritorno(_validate_gcode_block());
+	ritorno(_validate_gcode_block());//空的不用管
 	return (_execute_gcode_block());		// if successful execute the block
 }
 
@@ -478,7 +480,7 @@ static stat_t _execute_gcode_block()
 	stat_t status = STAT_OK;
 
 	cm_set_model_linenum(cm.gn.linenum);
-	EXEC_FUNC(cm_set_feed_rate_mode, feed_rate_mode);
+	EXEC_FUNC(cm_set_feed_rate_mode, feed_rate_mode);// EXEC_FUNC(f,v) if(cm.gf.v) { status=f(cm.gn.v);}
 	EXEC_FUNC(cm_set_feed_rate, feed_rate);
 	EXEC_FUNC(cm_feed_rate_override_factor, feed_rate_override_factor);
 	EXEC_FUNC(cm_traverse_override_factor, traverse_override_factor);
@@ -532,8 +534,8 @@ static stat_t _execute_gcode_block()
 			cm_set_absolute_override(cm.gn.absolute_override);	// apply override setting to gm struct
 			switch (cm.gn.motion_mode) {
 				case MOTION_MODE_CANCEL:            { status = cm_cancel_motion_mode(); break;}
-				case MOTION_MODE_STRAIGHT_TRAVERSE: { status = cm_straight_traverse(cm.gn.target, cm.gf.target); break;}
-				case MOTION_MODE_STRAIGHT_FEED:     { status = cm_straight_feed(cm.gn.target, cm.gf.target); break;}
+				case MOTION_MODE_STRAIGHT_TRAVERSE: { status = cm_straight_traverse(cm.gn.target, cm.gf.target); break;}//G0 - 直线运动
+				case MOTION_MODE_STRAIGHT_FEED:     { status = cm_straight_feed(cm.gn.target, cm.gf.target); break;} //G2
 
         		case MOTION_MODE_CW_ARC:                                                                            // G2
         		case MOTION_MODE_CCW_ARC:           { status = cm_arc_feed(cm.gn.target, cm.gf.target,              // G3

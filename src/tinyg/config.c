@@ -116,13 +116,6 @@ void config_init()
 {
 	nvObj_t *nv = nv_reset_nv_list(NUL);
 	config_init_assertions();
-
-#ifdef __ARM
-// The following code is offered until persistence is implemented.
-// Then you can use the AVR code (or something like it)
-	cfg.comm_mode = JSON_MODE;					// initial value until EEPROM is read
-	_set_defa(nv);
-#endif
 #ifdef __AVR
 	cm_set_units_mode(MILLIMETERS);				// must do inits in millimeter mode
 	nv->index = 0;								// this will read the first record in NVM
@@ -273,21 +266,52 @@ stat_t get_str(nvObj_t *nv)
 
 stat_t get_ui8(nvObj_t *nv)
 {
-	nv->value_int = *((uint8_t *)GET_TABLE_WORD(target));
+	if(cfgArray[nv->index].len==sizeof(uint32_t))
+	{
+		nv->value_int = *((uint32_t *)GET_TABLE_WORD(target));
+	}else if(cfgArray[nv->index].len==sizeof(uint16_t)){
+		nv->value_int = *((uint16_t *)GET_TABLE_WORD(target));
+	}else if(cfgArray[nv->index].len==sizeof(uint8_t)){
+		nv->value_int = *((uint8_t *)GET_TABLE_WORD(target));
+	}else{
+		while(1);
+	}
+	//nv->value_int = *((uint8_t *)GET_TABLE_WORD(target));
 	nv->valuetype = TYPE_INTEGER;
 	return (STAT_OK);
 }
 
 stat_t get_u16(nvObj_t *nv)
 {
-	nv->value_int = *((uint16_t *)GET_TABLE_WORD(target));
+	if(cfgArray[nv->index].len==sizeof(uint32_t))
+	{
+		nv->value_int = *((uint32_t *)GET_TABLE_WORD(target));
+	}else if(cfgArray[nv->index].len==sizeof(uint16_t)){
+		nv->value_int = *((uint16_t *)GET_TABLE_WORD(target));
+	}else if(cfgArray[nv->index].len==sizeof(uint8_t)){
+		nv->value_int = *((uint8_t *)GET_TABLE_WORD(target));
+	}else{
+		while(1);
+	}
+	//nv->value_int = *((uint16_t *)GET_TABLE_WORD(target));
 	nv->valuetype = TYPE_INTEGER;
 	return (STAT_OK);
 }
 
 stat_t get_u32(nvObj_t *nv)
 {
-    nv->value_int = *((uint32_t *)GET_TABLE_WORD(target));
+	if(cfgArray[nv->index].len==sizeof(uint32_t))
+	{
+		nv->value_int = *((uint32_t *)GET_TABLE_WORD(target));
+	}else if(cfgArray[nv->index].len==sizeof(uint16_t)){
+		nv->value_int = *((uint16_t *)GET_TABLE_WORD(target));
+	}else if(cfgArray[nv->index].len==sizeof(uint8_t)){
+		nv->value_int = *((uint8_t *)GET_TABLE_WORD(target));
+	}else{
+		while(1);
+	}
+	
+    //nv->value_int = *((uint32_t *)GET_TABLE_WORD(target));
     nv->valuetype = TYPE_INTEGER;
     return (STAT_OK);
 }
@@ -295,23 +319,60 @@ stat_t get_u32(nvObj_t *nv)
 stat_t get_data(nvObj_t *nv)
 {
 	uint32_t *v = (uint32_t*)&nv->value_flt;
-	*v = *((uint32_t *)GET_TABLE_WORD(target));
+	
+	if(cfgArray[nv->index].len==sizeof(uint32_t))
+	{
+		*v = *((uint32_t *)GET_TABLE_WORD(target));
+	}else if(cfgArray[nv->index].len==sizeof(uint16_t)){
+		*v = *((uint16_t *)GET_TABLE_WORD(target));
+	}else if(cfgArray[nv->index].len==sizeof(uint8_t)){
+		*v = *((uint8_t *)GET_TABLE_WORD(target));
+	}else{
+		while(1);
+	}
+	
+	
+	//*v = *((uint32_t *)GET_TABLE_WORD(target));
 	nv->valuetype = TYPE_DATA;
 	return (STAT_OK);
 }
 
 stat_t get_int(nvObj_t *nv)
 {
-//	nv->value_int = *((int32_t *)GET_TABLE_WORD(target));
-	nv->value_int = *((int8_t *)GET_TABLE_WORD(target));
+
+	if(cfgArray[nv->index].len==sizeof(uint32_t))
+	{
+		nv->value_int = *((uint32_t *)GET_TABLE_WORD(target));
+	}else if(cfgArray[nv->index].len==sizeof(uint16_t)){
+		nv->value_int = *((uint16_t *)GET_TABLE_WORD(target));
+	}else if(cfgArray[nv->index].len==sizeof(uint8_t)){
+		nv->value_int = *((uint8_t *)GET_TABLE_WORD(target));
+	}else{
+		while(1);
+	}
+	
+	//nv->value_int = *((int8_t *)GET_TABLE_WORD(target));
 	nv->valuetype = TYPE_SIGNED;
 	return (STAT_OK);
 }
 
 stat_t get_flt(nvObj_t *nv)
 {
-	nv->value_flt = *((float *)GET_TABLE_WORD(target));
-	nv->precision = (int8_t)GET_TABLE_WORD(precision);
+	//nv->value_flt = *((float *)GET_TABLE_WORD(target));
+	//nv->precision = (int8_t)GET_TABLE_WORD(precision);
+	if(cfgArray[nv->index].len==sizeof(float))
+	{
+		nv->value_flt = *((float *)GET_TABLE_WORD(target));
+		nv->precision = (int32_t)GET_TABLE_WORD(precision);
+	}else if(cfgArray[nv->index].len==sizeof(uint16_t)){
+		nv->value_flt = *((uint16_t *)GET_TABLE_WORD(target));
+		nv->precision = (int16_t)GET_TABLE_WORD(precision);
+	}else if(cfgArray[nv->index].len==sizeof(uint8_t)){
+		nv->value_flt = *((uint8_t *)GET_TABLE_WORD(target));
+		nv->precision = (int8_t)GET_TABLE_WORD(precision);
+	}else{
+		while(1);
+	}
 	nv->valuetype = TYPE_FLOAT;
 	return (STAT_OK);
 }
@@ -335,19 +396,53 @@ stat_t set_not(nvObj_t *nv) { return (STAT_OK); }
 
 stat_t set_ui8(nvObj_t *nv)
 {
-	*((uint8_t *)GET_TABLE_WORD(target)) = (uint8_t )nv->value_int;
+	//*((uint8_t *)GET_TABLE_WORD(target)) = (uint8_t )nv->value_int;
+	
+	if(cfgArray[nv->index].len==sizeof(uint32_t))
+	{
+		*((uint32_t *)GET_TABLE_WORD(target)) = nv->value_int;
+	}else if(cfgArray[nv->index].len==sizeof(uint16_t)){
+		*((uint16_t *)GET_TABLE_WORD(target)) = nv->value_int;
+	}else if(cfgArray[nv->index].len==sizeof(uint8_t)){
+		*((uint8_t *)GET_TABLE_WORD(target)) = nv->value_int;
+	}else{
+		while(1);
+	}
 	return(STAT_OK);
 }
 
 stat_t set_u16(nvObj_t *nv)
 {
-	*((uint16_t *)GET_TABLE_WORD(target)) = (uint16_t )nv->value_int;
+	//*((uint16_t *)GET_TABLE_WORD(target)) = (uint16_t )nv->value_int;
+	
+	if(cfgArray[nv->index].len==sizeof(uint32_t))
+	{
+		*((uint32_t *)GET_TABLE_WORD(target)) = nv->value_int;
+	}else if(cfgArray[nv->index].len==sizeof(uint16_t)){
+		*((uint16_t *)GET_TABLE_WORD(target)) = nv->value_int;
+	}else if(cfgArray[nv->index].len==sizeof(uint8_t)){
+		*((uint8_t *)GET_TABLE_WORD(target)) = nv->value_int;
+	}else{
+		while(1);
+	}
+	
 	return(STAT_OK);
 }
 
 stat_t set_u32(nvObj_t *nv)
 {
-    *((uint32_t *)GET_TABLE_WORD(target)) = (uint32_t )nv->value_int;
+    //*((uint32_t *)GET_TABLE_WORD(target)) = (uint32_t )nv->value_int;
+	
+	if(cfgArray[nv->index].len==sizeof(uint32_t))
+	{
+		*((uint32_t *)GET_TABLE_WORD(target)) = nv->value_int;
+	}else if(cfgArray[nv->index].len==sizeof(uint16_t)){
+		*((uint16_t *)GET_TABLE_WORD(target)) = nv->value_int;
+	}else if(cfgArray[nv->index].len==sizeof(uint8_t)){
+		*((uint8_t *)GET_TABLE_WORD(target)) = nv->value_int;
+	}else{
+		while(1);
+	}
     return(STAT_OK);
 }
 
@@ -377,16 +472,44 @@ stat_t set_0123(nvObj_t *nv)
 
 stat_t set_data(nvObj_t *nv)
 {
-	uint32_t *v = (uint32_t*)&nv->value_flt;
-	*((uint32_t *)GET_TABLE_WORD(target)) = *v;
+	//uint32_t *v = (uint32_t*)&nv->value_flt;
+	
+	if(cfgArray[nv->index].len==sizeof(uint32_t))
+	{
+		uint32_t *v = (uint32_t*)&nv->value_flt;
+		*((uint32_t *)GET_TABLE_WORD(target)) = *v;
+	}else if(cfgArray[nv->index].len==sizeof(uint16_t)){
+		uint16_t *v = (uint16_t*)&nv->value_flt;
+		*((uint16_t *)GET_TABLE_WORD(target)) = *v;
+	}else if(cfgArray[nv->index].len==sizeof(uint8_t)){
+		uint8_t *v = (uint8_t*)&nv->value_flt;
+		*((uint8_t *)GET_TABLE_WORD(target)) = *v;
+	}else{
+		while(1);
+	}
+	
+	//*((uint32_t *)GET_TABLE_WORD(target)) = *v;
 	nv->valuetype = TYPE_DATA;
 	return(STAT_OK);
 }
 
 stat_t set_flt(nvObj_t *nv)
 {
-	*((float *)GET_TABLE_WORD(target)) = nv->value_flt;
-	nv->precision = GET_TABLE_WORD(precision);
+	if(cfgArray[nv->index].len==sizeof(float))
+	{
+		*((float *)GET_TABLE_WORD(target)) = nv->value_flt;
+		nv->precision = (uint32_t)GET_TABLE_WORD(precision);
+	}else if(cfgArray[nv->index].len==sizeof(uint16_t)){
+		*((uint16_t *)GET_TABLE_WORD(target)) = nv->value_flt;
+		nv->precision = (uint16_t)GET_TABLE_WORD(precision);
+	}else if(cfgArray[nv->index].len==sizeof(uint8_t)){
+		*((uint8_t *)GET_TABLE_WORD(target)) = nv->value_flt;
+		nv->precision = (uint8_t)GET_TABLE_WORD(precision);
+	}else{
+		while(1);
+	}
+	
+	//nv->precision = GET_TABLE_WORD(precision);
 	nv->valuetype = TYPE_FLOAT;
 	return(STAT_OK);
 }

@@ -20,5 +20,8 @@ typedef enum {         		        // BSEL	  BSCALE
 		XIO_BAUD_1000000			//	1		0
 } xioBAUDRATES;
 
+int xio_usart_gets(char *buf, const int size);
+//≥ı ºªØ
+void xio_usart_Init(void);
 
 #endif

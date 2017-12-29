@@ -46,9 +46,7 @@
 #include "util.h"
 #include "xio.h"
 
-#ifdef __ARM
-#include "Reset.h"
-#endif
+
 
 /***********************************************************************************
  **** STRUCTURE ALLOCATIONS *********************************************************
@@ -97,18 +95,6 @@ void controller_init(uint8_t std_in, uint8_t std_out, uint8_t std_err)
 	cs.hw_platform = TINYG_HARDWARE_PLATFORM;		// NB: HW version is set from EEPROM
 	cs.controller_state = CONTROLLER_STARTUP;		// ready to run startup lines
 
-#ifdef __AVR1 //xzw168
-	xio_set_stdin(std_in);
-	xio_set_stdout(std_out);
-	xio_set_stderr(std_err);
-	xio.default_src = std_in;
-	controller_set_primary_source(xio.default_src);
-#endif
-
-#ifdef __ARM
-	cs.controller_state = CONTROLLER_NOT_CONNECTED;	// find USB next
-	IndicatorLed.setFrequency(100000);
-#endif
 }
 
 /*
@@ -154,7 +140,7 @@ static void _controller_HSM()
  	DISPATCH(_limit_switch_handler());          // invoke limit switch
     DISPATCH(_controller_state());              // controller state management
 	DISPATCH(_test_system_assertions());		// system integrity assertions
-	DISPATCH(_dispatch_control());				// read any control messages prior to executing cycles
+	DISPATCH(_dispatch_control());				// 在执行周期之前读取任何控制消息
 
 //----- planner hierarchy for gcode and cycles ---------------------------------------//
 
@@ -175,7 +161,7 @@ static void _controller_HSM()
 	DISPATCH(_sync_to_planner());				// ensure there is at least one free buffer in planning queue
 	DISPATCH(_sync_to_tx_buffer());				// sync with TX buffer (pseudo-blocking)
 	DISPATCH(set_baud_callback());				// (AVR only) perform baud rate update (must be after TX sync)
-	DISPATCH(_dispatch_command());				// read and execute next command
+	DISPATCH(_dispatch_command());				// 读取并执行下一个命令
 }
 
 /*****************************************************************************************
@@ -192,11 +178,7 @@ static stat_t _controller_state()
 	return (STAT_OK);
 #endif // __AVR
 
-#ifdef __ARM
-	// detect USB connection and transition to disconnected state if it disconnected
-	//	if (SerialUSB.isConnected() == false) cs.state = CONTROLLER_NOT_CONNECTED;
-	return (xio_callback());					// manages state changes in the XIO system
-#endif // __ARM
+
 }
 
 /*****************************************************************************
@@ -237,25 +219,7 @@ static stat_t _dispatch_control()
 }
 #endif // __AVR
 
-#ifdef __ARM
-static stat_t _dispatch_command()
-{
-    devflags_t flags = DEV_IS_BOTH;
-	cs.bufp = readline(flags, cs.linelen);
-    if (cs.bufp != (char *)NULL) {          // process the command
-        _dispatch_kernel();
-    }
-    return (STAT_OK);
-}
-static stat_t _dispatch_control()
-{
-    devflags_t flags = DEV_IS_CTRL;
-    if ((cs.bufp = readline(flags, cs.linelen)) != NULL) {
-        _dispatch_kernel();
-    }
-    return (STAT_OK);
-}
-#endif // __ARM
+
 
 static void _dispatch_kernel()
 {
@@ -360,7 +324,7 @@ static stat_t _shutdown_handler()
 
 	if (SysTickTimer_getValue() > cs.led_timer) {
 		cs.led_timer = SysTickTimer_getValue() + LED_ALARM_TIMER;
-		IndicatorLed_toggle();
+		//IndicatorLed_toggle(); xzw169 led
 	}
 	return (STAT_EAGAIN);	// EAGAIN prevents any lower-priority actions from running
 }

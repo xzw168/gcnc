@@ -98,17 +98,17 @@ static const char PROGMEM SR_DEFAULTS[] = "line,posx,posy,posz,posa,feed,vel,uni
 // *** Motor settings ************************************************************************************
 
 #define JERK_MAX 				20			// yes, that's "20,000,000" mm/(min^3)
-#define JUNCTION_DEVIATION		0.05		// default value, in mm
-#define JUNCTION_ACCELERATION	100000		// centripetal acceleration around corners
-#define JUNCTION_AGGRESSION     0.75		// new cornering algorithm - between 0.05 and 1.00 (max)
+#define JUNCTION_DEVIATION		0.05		// 默认值，以毫米为单位
+#define JUNCTION_ACCELERATION	100000		// 在角落附近的向心加速度
+#define JUNCTION_AGGRESSION     0.75		// 新的转弯算法 - 在0.05和1.00（最大）之间
 
-#define M1_MOTOR_MAP 			AXIS_X				// 1ma
-#define M1_STEP_ANGLE 			1.8					// 1sa
-#define M1_TRAVEL_PER_REV		1.25				// 1tr
-#define M1_MICROSTEPS			8					// 1mi		1,2,4,8
-#define M1_POLARITY				0					// 1po		0=normal, 1=reversed
-#define M1_POWER_MODE			MOTOR_POWER_MODE	// 1pm		standard
-#define M1_POWER_LEVEL			MOTOR_POWER_LEVEL	// 1mp
+#define M1_MOTOR_MAP 			AXIS_X				// 1ma 电机映射到轴
+#define M1_STEP_ANGLE 			1.8					// 1sa 每步1.8度
+#define M1_TRAVEL_PER_REV		1.25				// 1tr 丝杆转一圈多少毫米
+#define M1_MICROSTEPS			8					// 1mi 细分	1,2,4,8
+#define M1_POLARITY				0					// 1po 轴的正确运动设置极性。0 =顺时针旋转，1 =逆时针旋转
+#define M1_POWER_MODE			MOTOR_POWER_MODE	// 1pm 电源管理模式	0 =电机禁用，1 =电机始终打开，2 =电机在循环中，3 =电机仅在移动时打开
+#define M1_POWER_LEVEL			MOTOR_POWER_LEVEL	// 1mp 功率级别 0.000 =步进电机没有功率，1.00 =步进电机的最大功率
 
 #define M2_MOTOR_MAP	 		AXIS_Y
 #define M2_STEP_ANGLE			1.8
@@ -128,7 +128,7 @@ static const char PROGMEM SR_DEFAULTS[] = "line,posx,posy,posz,posa,feed,vel,uni
 
 #define M4_MOTOR_MAP			AXIS_A
 #define M4_STEP_ANGLE			1.8
-#define M4_TRAVEL_PER_REV		360			// degrees moved per motor rev
+#define M4_TRAVEL_PER_REV		360			//度每电机转速移动 degrees moved per motor rev
 #define M4_MICROSTEPS			8
 #define M4_POLARITY				0
 #define M4_POWER_MODE			MOTOR_POWER_MODE
@@ -152,20 +152,20 @@ static const char PROGMEM SR_DEFAULTS[] = "line,posx,posy,posz,posa,feed,vel,uni
 
 // *** axis settings ***
 
-#define X_AXIS_MODE 			AXIS_STANDARD		// xam		see canonical_machine.h cmAxisMode for valid values
-#define X_VELOCITY_MAX 			800 				// xvm		G0 max velocity in mm/min
-#define X_FEEDRATE_MAX 			X_VELOCITY_MAX		// xfr 		G1 max feed rate in mm/min
-#define X_TRAVEL_MIN			0					// xtn		monimum travel for soft limits
-#define X_TRAVEL_MAX 			150					// xtm		travel between switches or crashes
-#define X_JERK_MAX 				JERK_MAX			// xjm
-#define X_JERK_HOMING			(X_JERK_MAX * 2)	// xjh
-#define X_JUNCTION_DEVIATION 	JUNCTION_DEVIATION	// xjd
-#define X_SWITCH_MODE_MIN 		SW_MODE_HOMING		// xsn		SW_MODE_DISABLED, SW_MODE_HOMING, SW_MODE_LIMIT, SW_MODE_HOMING_LIMIT
-#define X_SWITCH_MODE_MAX 		SW_MODE_DISABLED	// xsx		SW_MODE_DISABLED, SW_MODE_HOMING, SW_MODE_LIMIT, SW_MODE_HOMING_LIMIT
-#define X_SEARCH_VELOCITY 		500					// xsv		move in negative direction
-#define X_LATCH_VELOCITY 		100					// xlv		mm/min
-#define X_LATCH_BACKOFF 		5					// xlb		mm
-#define X_ZERO_BACKOFF 			1					// xzb		mm
+#define X_AXIS_MODE 			AXIS_STANDARD		// xam		轴模式 0 =禁用。该轴的所有输入都将被忽略，轴将不会移动。1 =标准。线性轴以长度单位移动。旋转轴以度数移动。
+#define X_VELOCITY_MAX 			800 				// xvm		G0最大速度（毫米/分钟）
+#define X_FEEDRATE_MAX 			X_VELOCITY_MAX		// xfr 		G1最大进给速度，单位mm / min
+#define X_TRAVEL_MIN			0					// xtn		最小行程范围  如果最小值和最大值相等，则轴被视为无限轴（即无限制）
+#define X_TRAVEL_MAX 			150					// xtm		最大行程范围
+#define X_JERK_MAX 				JERK_MAX			// xjm		轴的最大加加速度值
+#define X_JERK_HOMING			(X_JERK_MAX * 2)	// xjh      归位的加加速度值，以在开关被击中或释放时停止移动。
+#define X_JUNCTION_DEVIATION 	JUNCTION_DEVIATION	// xjd      结点偏差 - 结合系统组中的结点加速度（$ JA） - 设置通过两条线路交汇处转弯时所使用的减速度。
+#define X_SWITCH_MODE_MIN 		SW_MODE_HOMING		// xsn		最小开关模式
+#define X_SWITCH_MODE_MAX 		SW_MODE_DISABLED	// xsx		最大开关模式
+#define X_SEARCH_VELOCITY 		500					// xsv		最初找到归位开关的速度。设定一个适中的速度，例如1/4到1/2的最大速度
+#define X_LATCH_VELOCITY 		100					// xlv		锁定相位的速度。将其设置得非常低以获得最佳定位精度，例如10 mm / min
+#define X_LATCH_BACKOFF 		5					// xlb		锁定期间退出开关的距离和清除。必须足够大才能完全清除交换机，否则您将看到令人沮丧的错误mm。
+#define X_ZERO_BACKOFF 			1					// xzb		设定机床坐标系零点之前到退刀开关的距离。通常不超过几毫米mm
 
 #define Y_AXIS_MODE 			AXIS_STANDARD
 #define Y_VELOCITY_MAX 			800

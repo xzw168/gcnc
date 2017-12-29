@@ -19,7 +19,7 @@
  */
 /* See github.com/Synthetos/tinyg for code and docs on the wiki
  */
-
+#include "main.h"
 #include "tinyg.h"					// #1 There are some dependencies
 #include "config.h"					// #2
 #include "hardware.h"
@@ -37,6 +37,9 @@
 #include "pwm.h"
 #include "xio.h"
 
+
+
+
 /******************** System Globals *************************/
 
 stat_t status_code;						    // allocate a variable for the ritorno macro
@@ -48,15 +51,42 @@ static char _status_msg[STATUS_MSG_LEN];
 /******************** Application Code ************************/
 
 
-
-/*
- * _system_init()
- */
-
-void _system_init(void)
+static void rcc_Init(void)
 {
-
+	RCC_APB2PeriphClockCmd(
+	RCC_APB2Periph_SYSCFG|
+	RCC_APB2Periph_USART1|
+	RCC_APB2Periph_ADC1|
+	RCC_APB2Periph_ADC2|
+	RCC_APB2Periph_ADC3, ENABLE);  
+	
+	RCC_AHB1PeriphClockCmd(
+	RCC_AHB1Periph_GPIOA|
+	RCC_AHB1Periph_GPIOB|
+	RCC_AHB1Periph_GPIOC|
+	RCC_AHB1Periph_GPIOD|
+	RCC_AHB1Periph_GPIOE|
+	RCC_AHB1Periph_DMA1 |
+	RCC_AHB1Periph_DMA2, ENABLE);
+	
+	RCC_APB1PeriphClockCmd(
+	RCC_AHB1Periph_DMA1|
+	RCC_AHB1Periph_DMA2|
+	RCC_APB1Periph_TIM2|
+	RCC_APB1Periph_TIM3|
+	RCC_APB1Periph_TIM4|
+	RCC_APB1Periph_TIM5|
+	RCC_APB1Periph_TIM6|
+	RCC_APB1Periph_TIM7|
+	RCC_APB1Periph_TIM12|
+	RCC_APB1Periph_TIM13|
+	RCC_APB1Periph_TIM14, ENABLE);
+	RCC_AHB3PeriphClockCmd(RCC_AHB3Periph_FSMC,ENABLE);
+	
+	
+	
 }
+
 
 /*
  * application_inits
@@ -108,9 +138,18 @@ static void _application_init_startup(void)
 int main(void)
 {
 
-
-	// system initialization
-	_system_init();
+	rcc_Init();
+	xio_usart_Init();
+	xyz_io_init();
+	xio_tim_Init();
+	// SystemFrequency / 1000    1ms中断一次
+	// SystemFrequency / 100000	 10us中断一次
+	// SystemFrequency / 1000000 1us中断一次
+	if (SysTick_Config(SystemCoreClock / 1000))
+	{ 
+		/* Capture error */ 
+		while (1);
+	}
 
 	// TinyG application setup
 	_application_init_services();
@@ -132,7 +171,7 @@ int main(void)
 char *get_status_message(stat_t status)
 {
 
-	return (char *)(&stat_msg[status]);
+	return (char *)(stat_msg[status]);
 }
 
 void assert_failed(uint8_t* file, uint32_t line)

@@ -1083,7 +1083,7 @@ stat_t cm_resume_origin_offsets()
  * Free Space Motion (4.3.4) *
  *****************************/
 /*
- * cm_straight_traverse() - G0 linear rapid
+ * cm_straight_traverse() - G0 线性快速
  */
 
 stat_t cm_straight_traverse(const float target[], const bool flags[])
@@ -1105,7 +1105,7 @@ stat_t cm_straight_traverse(const float target[], const bool flags[])
 	// prep and plan the move
 	cm_set_work_offsets();				        // capture the fully resolved offsets to the state
 
-    status = mp_aline(&cm.gm);                  // send the move to the planner
+    status = mp_aline(&cm.gm);                  //把这个举动发给策划者 send the move to the planner
     if ((status == STAT_MINIMUM_LENGTH_MOVE) || (status != STAT_MINIMUM_TIME_MOVE)) {
         status = STAT_OK;
     } else {
@@ -1367,7 +1367,7 @@ static void _exec_mist_coolant_control(float *value, bool *flags)
 {
 	cm.gm.mist_coolant = (uint8_t)value[0];
 
-#ifdef __AVR
+#ifdef __AVR1 //xzw169 雾化冷却液开/关
 	if (cm.gm.mist_coolant == true) {
 		gpio_set_bit_on(MIST_COOLANT_BIT);
     } else {
@@ -1375,13 +1375,7 @@ static void _exec_mist_coolant_control(float *value, bool *flags)
     }
 #endif // __AVR
 
-#ifdef __ARM
-	if (cm.gm.mist_coolant == true) {
-		coolant_enable_pin.set();
-    } else {
-	    coolant_enable_pin.clear();
-    }
-#endif // __ARM
+
 }
 
 stat_t cm_flood_coolant_control(const uint8_t flood_coolant)
@@ -1394,7 +1388,7 @@ static void _exec_flood_coolant_control(float *value, bool *flags)
 {
 	cm.gm.flood_coolant = (uint8_t)value[0];
 
-#ifdef __AVR
+#ifdef __AVR1 //xzw169 洪水冷却液开/关
 	if (cm.gm.flood_coolant == true) {
 		gpio_set_bit_on(FLOOD_COOLANT_BIT);
 	} else {
@@ -1404,15 +1398,7 @@ static void _exec_flood_coolant_control(float *value, bool *flags)
 	}
 #endif // __AVR
 
-#ifdef __ARM
-	if (cm.gm.flood_coolant == true) {
-		coolant_enable_pin.set();
-	} else {
-		coolant_enable_pin.clear();
-		float vect[] = { 0,0,0,0,0,0 };				    // turn off mist coolant
-		_exec_mist_coolant_control(vect, FLAGS_NONE);   // M9 special function
-	}
-#endif // __ARM
+
 }
 
 /*

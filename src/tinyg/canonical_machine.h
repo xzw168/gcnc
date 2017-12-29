@@ -158,7 +158,8 @@ typedef enum {						    // these are in order to optimized CASE statement
 	NEXT_ACTION_SUSPEND_ORIGIN_OFFSETS,	// G92.2
 	NEXT_ACTION_RESUME_ORIGIN_OFFSETS,	// G92.3
 	NEXT_ACTION_DWELL,					// G4
-	NEXT_ACTION_STRAIGHT_PROBE			// G38.2
+	NEXT_ACTION_STRAIGHT_PROBE,			// G38.2
+	NEXT_ACTION_SET_TL_OFFSET,          // G43
 } cmNextAction;
 
 typedef enum {						    // G Modal Group 1
@@ -278,10 +279,10 @@ typedef enum {					    // used for spindle and arc dir
 } cmDirection;
 
 typedef enum {					    // axis modes (ordered: see _cm_get_feed_time())
-	AXIS_DISABLED = 0,				// kill axis
-	AXIS_STANDARD,					// axis in coordinated motion w/standard behaviors
-	AXIS_INHIBITED,					// axis is computed but not activated
-	AXIS_RADIUS						// rotary axis calibrated to circumference
+	AXIS_DISABLED = 0,				// 禁用。该轴的所有输入都将被忽略，轴将不会移动。
+	AXIS_STANDARD,					// 标准。线性轴以长度单位移动。旋转轴以度数移动。
+	AXIS_INHIBITED,					// 被抑制。计划移动时会考虑轴值，但轴不会移动。使用它来执行Z kill或者仅执行一次计算。
+	AXIS_RADIUS						// 半径模式。（仅限旋转轴）在半径模式下，g代码值被解释为线性单位; 无论是英寸还是毫米，取决于当前的G20 / G21设置。线性单位转换为度是使用该轴的半径设置完成的。详情请参阅$ aRA。
 } cmAxisMode;	                    // ordering must be preserved. See cm_set_move_times()
 #define AXIS_MODE_MAX_LINEAR AXIS_INHIBITED
 #define AXIS_MODE_MAX_ROTARY AXIS_RADIUS
@@ -418,6 +419,7 @@ typedef struct GCodeInput {				// Gcode model inputs - meaning depends on contex
 	uint32_t linenum;					// N word
 	float target[AXES]; 				// XYZABC where the move should go. ALso used for offsets & other purposes
 
+	uint8_t H_word;                     // H word - used by G43s
 	uint8_t L_word;						// L word - used by G10s
 
 	float feed_rate; 					// F - normalized to millimeters/minute
@@ -474,6 +476,7 @@ typedef struct GCodeFlags {             // Gcode model input flags
     bool linenum;
     bool target[AXES];
 
+	bool H_word;
     bool L_word;
     bool feed_rate;
     bool feed_rate_mode;

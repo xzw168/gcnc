@@ -38,23 +38,23 @@
 #define SR_MATCH_PRECISION 0.001                // delta for floats to be declared equal for filtered status reports
 #define SR_WORKING_LIST_LEN (2*(NV_STATUS_REPORT_LEN+1)) // supports full replacements
 
-typedef enum {								    // status report enable and verbosity
-	SR_OFF = 0,									// no reports
-	SR_FILTERED,								// reports only values that have changed from the last report
-	SR_VERBOSE									// reports all values specified
+typedef enum {								    // 状态报告启用和详细程度
+	SR_OFF = 0,									// 没有报告
+	SR_FILTERED,								// 仅报告已从上一次报告更改的值
+	SR_VERBOSE									// 报告指定的所有值
 } srVerbosity;
 
 typedef enum {
-    SR_REQUEST_ASAP = 0,                        // request a full or filtered status report ASAP (depending on SR_VERBOSITY setting)
+    SR_REQUEST_ASAP = 0,                        // 请求尽快或过滤状态报告（取决于SR_VERBOSITY设置）
     SR_REQUEST_ASAP_UNFILTERED,                 // request a full status report ASAP (regardless of SR_VERBOSITY setting)
     SR_REQUEST_TIMED,                           // request a full or filtered status report at next timer interval (as above)
     SR_REQUEST_TIMED_UNFILTERED                 // request a full status report at next timer interval (as above)
 } srRequestType;
 
-typedef enum {								    // planner queue enable and verbosity
-	QR_OFF = 0,									// no response is provided
-	QR_SINGLE,									// queue depth reported
-	QR_TRIPLE									// queue depth reported for buffers, buffers added, buffered removed
+typedef enum {								    // 计划者队列启用和详细程度
+	QR_OFF = 0,									// 没有提供任何回应
+	QR_SINGLE,									// 队列深度报告
+	QR_TRIPLE									// 队列深度报告缓冲区，添加缓冲区，缓冲区删除
 } qrVerbosity;
 
 typedef struct srSingleton {

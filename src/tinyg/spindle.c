@@ -104,7 +104,7 @@ static void _exec_spindle_control(float *value, bool *flags)
 	uint8_t spindle_mode = (uint8_t)value[0];
 	cm_set_spindle_mode(MODEL, spindle_mode);
 
- #ifdef __AVR
+ #ifdef __AVR1 //xzw169 Ö÷Öá¿ØÖÆ
 	if (spindle_mode == SPINDLE_CW) {
 		gpio_set_bit_on(SPINDLE_BIT);
 		gpio_set_bit_off(SPINDLE_DIR);
@@ -115,17 +115,7 @@ static void _exec_spindle_control(float *value, bool *flags)
 		gpio_set_bit_off(SPINDLE_BIT);	// failsafe: any error causes stop
 	}
 #endif // __AVR
-#ifdef __ARM
-	if (spindle_mode == SPINDLE_CW) {
-		spindle_enable_pin.set();
-		spindle_dir_pin.clear();
-	} else if (spindle_mode == SPINDLE_CCW) {
-		spindle_enable_pin.set();
-		spindle_dir_pin.set();
-	} else {
-		spindle_enable_pin.clear();	// failsafe: any error causes stop
-	}
-#endif // __ARM
+
 
 	// PWM spindle control
 	pwm_set_duty(PWM_1, cm_get_spindle_pwm(spindle_mode) );

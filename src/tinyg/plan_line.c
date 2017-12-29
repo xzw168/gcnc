@@ -82,7 +82,7 @@ bool mp_runtime_is_idle()
 }
 
 /****************************************************************************************
- * mp_aline() - plan a line with acceleration / deceleration
+ * mp_aline() - 计划加速/减速线
  *
  *	This function uses constant jerk motion equations to plan acceleration and deceleration
  *	The jerk is the rate of change of acceleration; it's the 1st derivative of acceleration,

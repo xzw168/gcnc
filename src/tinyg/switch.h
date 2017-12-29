@@ -39,10 +39,10 @@
 // switch modes
 #define SW_HOMING_BIT 0x01
 #define SW_LIMIT_BIT 0x02
-#define SW_MODE_DISABLED 		0								// disabled for all operations
-#define SW_MODE_HOMING 			SW_HOMING_BIT					// enable switch for homing only
-#define SW_MODE_LIMIT 			SW_LIMIT_BIT					// enable switch for limits only
-#define SW_MODE_HOMING_LIMIT   (SW_HOMING_BIT | SW_LIMIT_BIT)	// homing and limits
+#define SW_MODE_DISABLED 		0								// 禁用 - 开关关闭不起作用。所有未使用的开关引脚必须设置为禁用
+#define SW_MODE_HOMING 			SW_HOMING_BIT					// 仅回原点 - 在回原点中开关处于激活状态，否则无效
+#define SW_MODE_LIMIT 			SW_LIMIT_BIT					// 仅限制 - 开关在归位中不活动，但在正常操作期间将作为终止开关。
+#define SW_MODE_HOMING_LIMIT   (SW_HOMING_BIT | SW_LIMIT_BIT)	// 归零限制 - 在归位期间开关处于活动状态，并在正常操作期间用作停止开关。
 #define SW_MODE_PROBE           4
 #define SW_MODE_MAX_VALUE 		SW_MODE_PROBE
 
@@ -81,6 +81,10 @@ typedef enum {	 			        // indexes into switch arrays
 /*
  * Switch control structures
  */
+
+typedef struct Timeout {
+    uint32_t _start, _delay;
+} Timeout_t;
 
 typedef struct swSwitch {
     swType type     : 1 ;

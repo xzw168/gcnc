@@ -334,6 +334,7 @@ typedef struct cfgItem {
 	fptrCmd set;						// SET binding aka uint8_t (*set)(nvObj_t *nv)
 	uint32_t *target;					// target for writing config value
 	float default_value;				// default value for config item - will be cast to uint32_t as required
+	uint8_t len;//xzw168
 } cfgItem_t;
 
 /**** static allocation and definitions ****/

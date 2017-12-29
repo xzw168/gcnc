@@ -30,9 +30,7 @@
 #include "canonical_machine.h"
 #include "util.h"
 
-#ifdef __AVR
-//#include "xmega/xmega_eeprom.h"
-#endif
+
 
 /***********************************************************************************
  **** STRUCTURE ALLOCATIONS ********************************************************
@@ -76,13 +74,7 @@ stat_t read_persistent_value(nvObj_t *nv)
 }
 #endif // __AVR
 
-#ifdef __ARM
-stat_t read_persistent_value(nvObj_t *nv)
-{
-	nv->value_int = 0;
-	return (STAT_OK);
-}
-#endif // __ARM
+
 
 #ifdef __AVR
 stat_t write_persistent_value(nvObj_t *nv)
@@ -102,12 +94,4 @@ stat_t write_persistent_value(nvObj_t *nv)
 }
 #endif // __AVR
 
-#ifdef __ARM
-stat_t write_persistent_value(nvObj_t *nv)
-{
-	if (cm.cycle_state != CYCLE_OFF) {
-        return(rpt_exception(STAT_COMMAND_NOT_ACCEPTED));	// can't write when machine is moving
-    }
-	return (STAT_OK);
-}
-#endif // __ARM
+

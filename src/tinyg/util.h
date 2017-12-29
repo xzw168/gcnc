@@ -35,13 +35,7 @@
 #ifndef UTIL_H_ONCE
 #define UTIL_H_ONCE
 
-#ifdef __ARM
-//#include <stdint.h>
-//#include "sam.h"
-#include "MotateTimers.h"
-using Motate::delay;
-using Motate::SysTickTimer;
-#endif
+
 
 /****** Global Scope Variables and Functions ******/
 
@@ -79,9 +73,6 @@ float max4(float x1, float x2, float x3, float x4);
 
 //*** string utilities ***
 
-//#ifdef __ARM
-//char * strcpy_U( char * dst, const char * src );
-//#endif
 
 uint8_t isnumber(char c);
 char *str_escape(char *dst, const char *src);

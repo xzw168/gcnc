@@ -266,9 +266,7 @@ char *pstr2str(const char *pgm_string)
 	strncpy_P(text_item, pgm_string, TEXT_ITEM_LEN);
 	return (text_item);
 #endif
-#ifdef __ARM
-	return ((char *)pgm_string);
-#endif
+
 }
 
 /*
@@ -311,11 +309,7 @@ char *strcat_literal_P(char *str, const char *src)
     while (*str++ != 0);
     return (--str);
 #endif
-#ifdef __ARM
-    strcpy(str, src);
-    while (*str++ != 0);
-    return (--str);
-#endif
+
 }
 
 char *strcat_integer(char *str, const uint32_t value)
@@ -394,19 +388,19 @@ uint16_t compute_checksum(char const *string, const uint16_t length)
  * SysTickTimer_getValue() - this is a hack to get around some compatibility problems
  */
 
-#ifdef __AVR
-uint32_t SysTickTimer_getValue()
+uint32_t Tick=0;
+void SysTick_Handler(void)
 {
-	return 0;//(rtc.sys_ticks);//xzw168
+	Tick++;
 }
-#endif // __AVR
 
-#ifdef __ARM
+
 uint32_t SysTickTimer_getValue()
 {
-	return (SysTickTimer.getValue());
+	return Tick;//(rtc.sys_ticks);//xzw168
 }
-#endif // __ARM
+
+
 
 /***********************************************
  **** Very Fast Number to ASCII Conversions ****

@@ -120,6 +120,7 @@ stat_t rpt_exception(stat_t status, const char *msg)
         char line_msg[LINE_MSG_LEN];
         sprintf_P(line_msg, PSTR("{\"er\":{\"fb\":%0.2f,\"st\":%d,\"msg\":\"%s - %s\"}}\n"),
             TINYG_FIRMWARE_BUILD, status, get_status_message(status), msg);
+
         printf(json_relax(line_msg));
     }
     return (status);			// makes it possible to inline, e.g: return(rpt_exception(status, msg));

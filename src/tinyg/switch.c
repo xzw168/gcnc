@@ -53,66 +53,10 @@
 static bool _read_raw_switch(const uint8_t sw_num);
 static void _dispatch_switch(const uint8_t sw_num);
 switches_t sw;
-/*
- * Interrupt levels and vectors - The vectors are hard-wired to xmega ports
- * If you change axis port assignments you need to change these, too.
- *
- *  #define GPIO1_INTLVL (PORT_INT0LVL_HI_gc|PORT_INT1LVL_HI_gc)	// can't be hi
- *  #define GPIO1_INTLVL (PORT_INT0LVL_MED_gc|PORT_INT1LVL_MED_gc)
- *  #define GPIO1_INTLVL (PORT_INT0LVL_LO_gc|PORT_INT1LVL_LO_gc)	// shouldn't be low
- */
-#define GPIO1_INTLVL (PORT_INT0LVL_MED_gc|PORT_INT1LVL_MED_gc)
-
-// port assignments for vectors
-// WARNING: THis may not be correct for v6 and earlier boards due to the port assignment shift
-#define X_MIN_ISR_vect PORTA_INT0_vect	// these must line up with the SWITCH assignments in hardware.h
-#define Y_MIN_ISR_vect PORTD_INT0_vect
-#define Z_MIN_ISR_vect PORTE_INT0_vect
-#define A_MIN_ISR_vect PORTF_INT0_vect
-#define X_MAX_ISR_vect PORTA_INT1_vect
-#define Y_MAX_ISR_vect PORTD_INT1_vect
-#define Z_MAX_ISR_vect PORTE_INT1_vect
-#define A_MAX_ISR_vect PORTF_INT1_vect
-
-/* Note: v7 boards have external strong pullups on GPIO2 pins (2.7K ohm).
- *	v6 and earlier use internal pullups only. Internal pullups are set
- *	regardless of board type but are extraneous for v7 boards.
- */
-#define PIN_MODE PORT_OPC_PULLUP_gc				// pin mode. see iox192a3.h for details
-//#define PIN_MODE PORT_OPC_TOTEM_gc			// alternate pin mode for v7 boards
-
-/*
- * switch_init()    - initialize homing/limit switches
- * reset_switches() - reset all switches
- *
- *	switch_init() assumes sys_init() and st_init() have been run previously to
- *	bind the ports and set bit IO directions, respectively
- *
- * Here's some old code from when switches fired on one edge or the other:
- *   uint8_t int_mode = (sw.switch_type == SW_TYPE_NORMALLY_OPEN) ? PORT_ISC_FALLING_gc : PORT_ISC_RISING_gc;
- */
 
 void switch_init(void)
 {
-/*	for (uint8_t i=0; i<NUM_SWITCH_PAIRS; i++) {  //xz168
-		// setup input bits and interrupts (previously set to inputs by st_init())
-		if (sw.s[MIN_SWITCH(i)].mode != SW_MODE_DISABLED) {
-			hw.sw_port[i]->DIRCLR = SW_MIN_BIT_bm;		 	// set min input - see 13.14.14
-			hw.sw_port[i]->PIN6CTRL = (PIN_MODE | PORT_ISC_BOTHEDGES_gc);
-			hw.sw_port[i]->INT0MASK = SW_MIN_BIT_bm;	 	// interrupt on min switch
-		} else {
-			hw.sw_port[i]->INT0MASK = 0;	 				// disable interrupt
-		}
-		if (sw.s[MAX_SWITCH(i)].mode != SW_MODE_DISABLED) {
-			hw.sw_port[i]->DIRCLR = SW_MAX_BIT_bm;		 	// set max input - see 13.14.14
-			hw.sw_port[i]->PIN7CTRL = (PIN_MODE | PORT_ISC_BOTHEDGES_gc);
-			hw.sw_port[i]->INT1MASK = SW_MAX_BIT_bm;		// max on INT1
-		} else {
-			hw.sw_port[i]->INT1MASK = 0;
-		}
-		// set interrupt levels. Interrupts must be enabled in main()
-		hw.sw_port[i]->INTCTRL = GPIO1_INTLVL;				// see gpio.h for setting
-	}*/
+
 	reset_switches();
 }
 
@@ -143,38 +87,11 @@ void reset_switches()
 
 uint8_t get_switch_mode(const uint8_t sw_num) { return (sw.s[sw_num].mode);}
 
-/*
- * Switch processing routines
- *
- * ISRs (Interrupt Service Routines)
- * _read_raw_switch() - primitive to read and sense correct input
- * _dispatch_switch() - process a switch interrupt
- */
 
-/*ISR(X_MIN_ISR_vect)	{ _dispatch_switch(SW_MIN_X);}//xzw168
-ISR(Y_MIN_ISR_vect)	{ _dispatch_switch(SW_MIN_Y);}
-ISR(Z_MIN_ISR_vect)	{ _dispatch_switch(SW_MIN_Z);}
-ISR(A_MIN_ISR_vect)	{ _dispatch_switch(SW_MIN_A);}
-ISR(X_MAX_ISR_vect)	{ _dispatch_switch(SW_MAX_X);}
-ISR(Y_MAX_ISR_vect)	{ _dispatch_switch(SW_MAX_Y);}
-ISR(Z_MAX_ISR_vect)	{ _dispatch_switch(SW_MAX_Z);}
-ISR(A_MAX_ISR_vect)	{ _dispatch_switch(SW_MAX_A);}*/
 
 static bool _read_raw_switch(const uint8_t sw_num)
 {
-	uint8_t raw;    // raw is a naked bit, like 0b01000000 or 0b00000000
-	switch (sw_num) {
-		case SW_MIN_X: { raw = hw.sw_port[AXIS_X]->IN & SW_MIN_BIT_bm; break;}
-		case SW_MAX_X: { raw = hw.sw_port[AXIS_X]->IN & SW_MAX_BIT_bm; break;}
-		case SW_MIN_Y: { raw = hw.sw_port[AXIS_Y]->IN & SW_MIN_BIT_bm; break;}
-		case SW_MAX_Y: { raw = hw.sw_port[AXIS_Y]->IN & SW_MAX_BIT_bm; break;}
-		case SW_MIN_Z: { raw = hw.sw_port[AXIS_Z]->IN & SW_MIN_BIT_bm; break;}
-		case SW_MAX_Z: { raw = hw.sw_port[AXIS_Z]->IN & SW_MAX_BIT_bm; break;}
-		case SW_MIN_A: { raw = hw.sw_port[AXIS_A]->IN & SW_MIN_BIT_bm; break;}
-		case SW_MAX_A: { raw = hw.sw_port[AXIS_A]->IN & SW_MAX_BIT_bm; break;}
-        default: { return (false); }    // ERROR
-	}
-    return ((bool)raw ^ !(bool)sw.s[sw_num].type);	    // XOR to correct for ACTIVE mode. Casts to bool.
+    return SW_IN(sw_num);	    // XOR to correct for ACTIVE mode. Casts to bool.
 }
 
 static void _dispatch_switch(const uint8_t sw_num)

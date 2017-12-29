@@ -247,8 +247,8 @@
 //See hardware.h for platform specific stepper definitions
 
 typedef enum {
-	PREP_BUFFER_OWNED_BY_LOADER = 0,	// staging buffer is ready for load
-	PREP_BUFFER_OWNED_BY_EXEC			// staging buffer is being loaded
+	PREP_BUFFER_OWNED_BY_LOADER = 0,	// 分段缓冲区已准备好加载
+	PREP_BUFFER_OWNED_BY_EXEC			// 正在加载分段缓冲区
 } prepBufferState;
 
 // Currently there is no distinction between IDLE and OFF (DEENERGIZED)

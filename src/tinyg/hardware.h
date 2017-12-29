@@ -111,36 +111,11 @@ typedef enum {
  *** These are not all the same, and must line up in multiple places in gpio.h ***
  * Sorry if this is confusing - it's a board routing issue
  */
-#define PORT_MOTOR_1	PORTA			// motors mapped to ports
-#define PORT_MOTOR_2 	PORTA
-#define PORT_MOTOR_3	PORTA
-#define PORT_MOTOR_4	PORTA
 
-#define PORT_SWITCH_X 	PORTA			// Switch axes mapped to ports
-#define PORT_SWITCH_Y 	PORTA
-#define PORT_SWITCH_Z 	PORTA
-#define PORT_SWITCH_A 	PORTA
 
-#define PORT_OUT_V7_X	PORTA			// v7 mapping - Output bits mapped to ports
-#define PORT_OUT_V7_Y 	PORTA
-#define PORT_OUT_V7_Z	PORTA
-#define PORT_OUT_V7_A	PORTA
 
-#define PORT_OUT_V6_X	PORTA			// v6 and earlier mapping - Output bits mapped to ports
-#define PORT_OUT_V6_Y 	PORTA
-#define PORT_OUT_V6_Z	PORTA
-#define PORT_OUT_V6_A	PORTA
 
-// These next four must be changed when the PORT_MOTOR_* definitions change!
-#define PORTCFG_VP0MAP_PORT_MOTOR_1_gc PORTCFG_VP0MAP_PORTA_gc
-#define PORTCFG_VP1MAP_PORT_MOTOR_2_gc PORTCFG_VP1MAP_PORTF_gc
-#define PORTCFG_VP2MAP_PORT_MOTOR_3_gc PORTCFG_VP2MAP_PORTE_gc
-#define PORTCFG_VP3MAP_PORT_MOTOR_4_gc PORTCFG_VP3MAP_PORTD_gc
 
-#define PORT_MOTOR_1_VPORT	VPORT0
-#define PORT_MOTOR_2_VPORT	VPORT0
-#define PORT_MOTOR_3_VPORT	VPORT0
-#define PORT_MOTOR_4_VPORT	VPORT0
 
 /*
  * Port setup - Stepper / Switch Ports:
@@ -193,13 +168,7 @@ typedef enum {			    // motor control port bit positions
 
 /* Timer assignments - see specific modules for details) */
 
-#define TIMER_DDA			TCC0		// DDA timer 	(see stepper.h)
-#define TIMER_DWELL	 		TCD0		// Dwell timer	(see stepper.h)
-#define TIMER_LOAD			TCE0		// Loader timer	(see stepper.h)
-#define TIMER_EXEC			TCF0		// Exec timer	(see stepper.h)
-#define TIMER_5				TCC1		// unallocated timer
-#define TIMER_PWM1			TCD1		// PWM timer #1 (see pwm.c)
-#define TIMER_PWM2			TCE1		// PWM timer #2	(see pwm.c)
+
 
 /* Timer setup for stepper and dwells */
 
@@ -209,54 +178,9 @@ typedef enum {			    // motor control port bit positions
 #define EXEC_TIMER_PERIOD 	100				// cycles you have to shut off SW interrupt
 #define EXEC_TIMER_PERIOD_LONG 100			// cycles you have to shut off SW interrupt
 
-#define STEP_TIMER_TYPE		TC0_struct 		// stepper subsybstem uses all the TC0's
-#define STEP_TIMER_DISABLE 	0				// turn timer off (clock = 0 Hz)
-#define STEP_TIMER_ENABLE	1				// turn timer clock on (F_CPU = 32 Mhz)
-#define STEP_TIMER_WGMODE	0				// normal mode (count to TOP and rollover)
-
-#define LOAD_TIMER_DISABLE 	0				// turn load timer off (clock = 0 Hz)
-#define LOAD_TIMER_ENABLE	1				// turn load timer clock on (F_CPU = 32 Mhz)
-#define LOAD_TIMER_WGMODE	0				// normal mode (count to TOP and rollover)
-
-#define EXEC_TIMER_DISABLE 	0				// turn exec timer off (clock = 0 Hz)
-#define EXEC_TIMER_ENABLE	1				// turn exec timer clock on (F_CPU = 32 Mhz)
-#define EXEC_TIMER_WGMODE	0				// normal mode (count to TOP and rollover)
-
-#define TIMER_DDA_ISR_vect	TCC0_OVF_vect	// must agree with assignment in system.h
-#define TIMER_DWELL_ISR_vect TCD0_OVF_vect	// must agree with assignment in system.h
-#define TIMER_LOAD_ISR_vect	TCE0_OVF_vect	// must agree with assignment in system.h
-#define TIMER_EXEC_ISR_vect	TCF0_OVF_vect	// must agree with assignment in system.h
-
-#define TIMER_OVFINTLVL_HI	3				// timer interrupt level (3=hi)
-#define	TIMER_OVFINTLVL_MED 2;				// timer interrupt level (2=med)
-#define	TIMER_OVFINTLVL_LO  1;				// timer interrupt level (1=lo)
-
-#define TIMER_DDA_INTLVL 	TIMER_OVFINTLVL_HI
-#define TIMER_DWELL_INTLVL	TIMER_OVFINTLVL_HI
-#define TIMER_LOAD_INTLVL	TIMER_OVFINTLVL_HI
-#define TIMER_EXEC_INTLVL	TIMER_OVFINTLVL_LO
 
 
-/**** Device singleton - global structure to allow iteration through similar devices ****/
-/*
-	Ports are shared between steppers and GPIO so we need a global struct.
-	Each xmega port has 3 bindings; motors, switches and the output bit
 
-	The initialization sequence is important. the order is:
-		- sys_init()	binds all ports to the device struct
-		- st_init() 	sets IO directions and sets stepper VPORTS and stepper specific functions
-		- gpio_init()	sets up input and output functions and required interrupts
-
-	Care needs to be taken in routines that use ports not to write to bits that are
-	not assigned to the designated function - ur unpredicatable results will occur
-*/
-
-typedef struct hmSingleton {
-	PORT_t *st_port[MOTORS];		// bindings for stepper motor ports (stepper.c)
-	PORT_t *sw_port[MOTORS];		// bindings for switch ports (GPIO2)
-	PORT_t *out_port[MOTORS];		// bindings for output ports (GPIO1)
-} hwSingleton_t;
-extern hwSingleton_t hw;
 
 /*** function prototypes ***/
 
